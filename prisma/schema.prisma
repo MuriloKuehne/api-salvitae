@@ -37,7 +37,7 @@ model Patient {
   id          String         @id @default(uuid())
   name        String
   cpf         String         @unique
-  birthDate   DateTime       @map("birth_date")
+  birthDate   String       @map("birth_date")
 
   doctorId    String?
   doctor      User?          @relation("DoctorPatients", fields: [doctorId], references: [id])
