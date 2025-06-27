@@ -8,60 +8,116 @@ datasource db {
 }
 
 enum UserRole {
-  customer 
-  sale
+  doctor
+  secretary
 }
 
-enum DeliveryStatus {
-  pending
-  shipped
-  delivered
-  cancelled
+enum AppointmentType {
+  first
+  followUp
 }
 
 model User {
-  id       String   @id @default(uuid())
-  name    String
-  email     String   @unique
-  password String
+  id        String    @id @default(uuid())
+  name      String
+  email     String    @unique
+  password  String
+  role      UserRole  @default(secretary)
 
-  role     UserRole @default(customer)
+  patients  Patient[] @relation("DoctorPatients")
+  consultations Consultation[] @relation("DoctorConsultations")
 
-  deliveries Delivery[]
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Patient {
+  id          String         @id @default(uuid())
+  name        String
+  cpf         String         @unique
+  birthDate   DateTime       @map("birth_date")
+
+  doctorId    String?
+  doctor      User?          @relation("DoctorPatients", fields: [doctorId], references: [id])
   
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  consultations Consultation[]
 
-  @@map ("users")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+
+  @@map("patients")
 }
 
-model Delivery {
-  id         String   @id @default(uuid())
-  userId      String  @map("user_id")
-  description String
+model Consultation {
+  id            String           @id @default(uuid())
+  patientId     String           @map("patient_id")
+  doctorId      String           @map("doctor_id")
+  type          AppointmentType  @default(first)
 
-  status     DeliveryStatus   @default(pending)
+  createdAt     DateTime         @default(now()) @map("created_at")
+  updatedAt     DateTime         @updatedAt @map("updated_at")
 
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  patient       Patient          @relation(fields: [patientId], references: [id])
+  doctor        User             @relation("DoctorConsultations", fields: [doctorId], references: [id])
 
+  anamnese      Anamnese?
+  hpp           HPP?
+  dados         Dados?
+  exames        Exames?
 
-
-  user       User     @relation(fields: [userId], references: [id]) 
-  logs       DeliveryLog[]
-
-  @@map ("deliveries")
+  @@map("consultations")
 }
 
-model DeliveryLog {
-  id         String   @id @default(uuid())
-  description String
-  deliveryId String   @map("delivery_id")
+model Anamnese {
+  id             String       @id @default(uuid())
+  consultationId String       @unique @map("consultation_id")
+  content        String
 
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
+  consultation   Consultation @relation(fields: [consultationId], references: [id])
 
-  delivery   Delivery @relation(fields: [deliveryId], references: [id])
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
 
-  @@map ("delivery_logs")
+  @@map("anamnese")
+}
+
+model HPP {
+  id             String       @id @default(uuid())
+  consultationId String       @unique @map("consultation_id")
+  content        String
+
+  consultation   Consultation @relation(fields: [consultationId], references: [id])
+
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  @@map("hpp")
+}
+
+model Dados {
+  id             String       @id @default(uuid())
+  consultationId String       @unique @map("consultation_id")
+  content        String
+
+  consultation   Consultation @relation(fields: [consultationId], references: [id])
+
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  @@map("dados")
+}
+
+model Exames {
+  id             String       @id @default(uuid())
+  consultationId String       @unique @map("consultation_id")
+  content        String
+
+  consultation   Consultation @relation(fields: [consultationId], references: [id])
+
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  @@map("exames")
 }
