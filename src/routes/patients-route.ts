@@ -17,9 +17,12 @@ patientsRoutes.post(
   patientsController.create
 )
 patientsRoutes.get("/:id/show", ensureAuthenticated, patientsController.show)
+patientsRoutes.delete(
+  "/:id/delete",
+  ensureAuthenticated,
+  patientsController.delete
+)
 
 patientsRoutes.put("/:id", ensureAuthenticated, patientsController.update)
-patientsRoutes.delete("/:id", ensureAuthenticated, patientsController.delete)
 
-patientsRoutes.get("/", ensureAuthenticated, patientsController.index)
 export { patientsRoutes }

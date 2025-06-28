@@ -62,12 +62,6 @@ class PatientsController {
       .json({ message: "Paciente criado com sucesso." })
   }
 
-  async index(request: Request, response: Response) {
-    const patients = await prisma.patient.findMany({})
-
-    return response.json(patients)
-  }
-
   async show(request: Request, response: Response) {
     const { id } = request.params
 
@@ -95,10 +89,20 @@ class PatientsController {
     const { id } = request.params
 
     const bodySchema = z.object({
-      name: z.string().min(1).optional(),
-      cpf: z.string().min(11).max(14).optional(),
-      birthDate: z.string().optional(),
-      doctor_id: z.string().uuid().optional(),
+      nome: z.string().min(1),
+      cpf: z.string().min(11).max(14),
+      birthDate: z.string(),
+      sexo: z.string(),
+      telefone: z.string(),
+      altura: z.string(),
+      peso: z.string(),
+      etnia: z.string(),
+      cidade: z.string(),
+      bairro: z.string(),
+      rua: z.string(),
+      num: z.string(),
+      profissao: z.string(),
+      estadoCivil: z.string(),
     })
 
     const data = bodySchema.parse(request.body)
@@ -120,7 +124,7 @@ class PatientsController {
       where: { id },
     })
 
-    return response.status(204).send()
+    return response.status(204).json({ message: "O paciente foi removido." })
   }
 }
 
