@@ -5,20 +5,55 @@ import z from "zod"
 class PatientsController {
   async create(request: Request, response: Response) {
     const bodySchema = z.object({
-      name: z.string().min(1),
+      nome: z.string().min(1),
       cpf: z.string().min(11).max(14),
-      birthDate: z.string().datetime(), // ou use .refine(...) para Date local
-      doctor_id: z.string().uuid().optional(),
+      birthDate: z.string(),
+      sexo: z.string(),
+      telefone: z.string(),
+      altura: z.string(),
+      peso: z.string(),
+      etnia: z.string(),
+      cidade: z.string(),
+      bairro: z.string(),
+      rua: z.string(),
+      num: z.string(),
+      profissao: z.string(),
+      estadoCivil: z.string(),
     })
 
-    const { name, cpf, birthDate, doctor_id } = bodySchema.parse(request.body)
+    const {
+      nome,
+      cpf,
+      birthDate,
+      sexo,
+      telefone,
+      altura,
+      peso,
+      etnia,
+      cidade,
+      bairro,
+      rua,
+      num,
+      profissao,
+      estadoCivil,
+    } = bodySchema.parse(request.body)
 
     await prisma.patient.create({
       data: {
-        name,
+        nome,
         cpf,
         birthDate,
-        doctorId: doctor_id,
+        sexo,
+        telefone,
+        altura,
+        peso,
+        etnia,
+        cidade,
+        bairro,
+        rua,
+        num,
+        profissao,
+        estadoCivil,
       },
     })
 
@@ -28,16 +63,7 @@ class PatientsController {
   }
 
   async index(request: Request, response: Response) {
-    const patients = await prisma.patient.findMany({
-      include: {
-        doctor: {
-          select: {
-            name: true,
-            email: true,
-          },
-        },
-      },
-    })
+    const patients = await prisma.patient.findMany({})
 
     return response.json(patients)
   }
@@ -52,14 +78,7 @@ class PatientsController {
           include: {
             anamnese: true,
             hpp: true,
-            dados: true,
             exames: true,
-          },
-        },
-        doctor: {
-          select: {
-            name: true,
-            email: true,
           },
         },
       },

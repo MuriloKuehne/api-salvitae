@@ -8,14 +8,16 @@ datasource db {
 }
 
 enum UserRole {
-  doctor
+  admin
   secretary
 }
 
-enum AppointmentType {
+enum ConsultationType {
   first
   followUp
 }
+
+
 
 model User {
   id        String    @id @default(uuid())
@@ -35,12 +37,23 @@ model User {
 
 model Patient {
   id          String         @id @default(uuid())
-  name        String
+  nome        String
   cpf         String         @unique
   birthDate   String       @map("birth_date")
+  sexo        String
+  telefone        String
+  altura        String
+  peso        String
+  etnia        String
+  cidade        String
+  bairro        String
+  rua        String
+  num        String  
+  profissao        String 
+  estadoCivil        String @map("estado_civil")
 
-  doctorId    String?
-  doctor      User?          @relation("DoctorPatients", fields: [doctorId], references: [id])
+  adminId    String?
+  admin      User?          @relation("DoctorPatients", fields: [adminId], references: [id])
   
   consultations Consultation[]
 
@@ -53,18 +66,17 @@ model Patient {
 model Consultation {
   id            String           @id @default(uuid())
   patientId     String           @map("patient_id")
-  doctorId      String           @map("doctor_id")
-  type          AppointmentType  @default(first)
+  adminId      String           @map("admin_id")
+  type          ConsultationType  @default(first)
 
   createdAt     DateTime         @default(now()) @map("created_at")
   updatedAt     DateTime         @updatedAt @map("updated_at")
 
   patient       Patient          @relation(fields: [patientId], references: [id])
-  doctor        User             @relation("DoctorConsultations", fields: [doctorId], references: [id])
+  admin        User             @relation("DoctorConsultations", fields: [adminId], references: [id])
 
   anamnese      Anamnese?
   hpp           HPP?
-  dados         Dados?
   exames        Exames?
 
   @@map("consultations")
@@ -73,7 +85,15 @@ model Consultation {
 model Anamnese {
   id             String       @id @default(uuid())
   consultationId String       @unique @map("consultation_id")
-  content        String
+  HMA        String
+  Exf        String
+  Temp        String
+  AGI        String
+  Cd         String
+  FC         String
+  ACV         String
+  PA         String
+  Outros         String
 
   consultation   Consultation @relation(fields: [consultationId], references: [id])
 
@@ -86,7 +106,12 @@ model Anamnese {
 model HPP {
   id             String       @id @default(uuid())
   consultationId String       @unique @map("consultation_id")
-  content        String
+  PatoPrev        String @map("patologias-previas")
+  Medicacao        String
+  Alergia        String
+  Cirurgia        String
+  Tratamento        String
+  HistFam        String @map("historico-familiar")
 
   consultation   Consultation @relation(fields: [consultationId], references: [id])
 
@@ -96,23 +121,18 @@ model HPP {
   @@map("hpp")
 }
 
-model Dados {
-  id             String       @id @default(uuid())
-  consultationId String       @unique @map("consultation_id")
-  content        String
-
-  consultation   Consultation @relation(fields: [consultationId], references: [id])
-
-  createdAt      DateTime     @default(now()) @map("created_at")
-  updatedAt      DateTime     @updatedAt @map("updated_at")
-
-  @@map("dados")
-}
 
 model Exames {
   id             String       @id @default(uuid())
   consultationId String       @unique @map("consultation_id")
-  content        String
+  data        String @map("data_hora") //O objetivo é ser manual mesmo
+  Er        String @map("Er(mi/mm3)")
+  Hg        String @map("Hg(g%)")
+  Ht        String @map("Ht(%)")
+  Leu        String @map("Leu(/mm3)")
+  Plq        String @map("Plq(/mm3)")
+  PA         String @map("PA(mmHg)")
+  Obs        String 
 
   consultation   Consultation @relation(fields: [consultationId], references: [id])
 

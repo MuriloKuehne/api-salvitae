@@ -8,11 +8,18 @@ const patientsRoutes = Router()
 const patientsController = new PatientsController()
 const deliveriesStatusController = new DeliveriesStatusController()
 
-patientsRoutes.use(ensureAuthenticated, verifyUserAuthorization(["doctor"]))
-patientsRoutes.post("/", ensureAuthenticated, patientsController.create)
-patientsRoutes.get("/", ensureAuthenticated, patientsController.index)
-patientsRoutes.get("/:id", ensureAuthenticated, patientsController.show)
+patientsRoutes.use("/", ensureAuthenticated, verifyUserAuthorization(["admin"]))
+
+patientsRoutes.post(
+  "/",
+  ensureAuthenticated,
+  verifyUserAuthorization(["admin", "secretary"]),
+  patientsController.create
+)
+patientsRoutes.get("/:id/show", ensureAuthenticated, patientsController.show)
+
 patientsRoutes.put("/:id", ensureAuthenticated, patientsController.update)
 patientsRoutes.delete("/:id", ensureAuthenticated, patientsController.delete)
 
+patientsRoutes.get("/", ensureAuthenticated, patientsController.index)
 export { patientsRoutes }
